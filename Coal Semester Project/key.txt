@@ -1,0 +1,44 @@
+INCLUDE Irvine32.inc
+strLen=26
+.data
+key BYTE strLen DUP(?)
+k_size dword ?
+Grid byte 25 DUP(?)
+.code
+    main PROC
+        call GenerateRandomString
+        exit
+    main ENDP
+
+    GenerateRandomString PROC USES ecx
+        mov ecx, lengthOf key
+        mov esi, offset key
+		mov eax,strlen
+		call randomize
+		call randomrange
+		mov k_size,eax
+		mov ecx,k_size
+        L2:
+            mov eax, strlen
+            call RandomRange
+            add eax, 65
+			mov edx,ecx
+			mov ecx,k_size
+			mov edi,offset key
+			repne scasb
+			jz sameChar
+            mov [esi], eax
+			call writechar
+			inc esi
+			mov ecx,edx
+			jmp outss
+			sameChar:
+			mov ecx,edx
+			inc ecx
+			outss:
+        loop L2
+		mov edx,offset key
+        ret
+    GenerateRandomString ENDP
+
+END main

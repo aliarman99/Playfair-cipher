@@ -1,0 +1,45 @@
+GenerateGrid PROC
+	mov esi, offset key
+	mov edi, offset Grid
+	mov ecx,k_size
+	L1:
+	cmp byte ptr [esi],'J'
+	je skip
+	mov ebx,[esi]
+	mov [edi],ebx
+	inc edi
+	skip:
+	inc esi
+	loop L1
+	mov ecx,26
+	mov ecx,ebx
+	mov ebx,0
+	mov bl,65
+	L2:
+	mov esi,0
+	mov edx,0
+	mov edx,ecx
+	mov ecx,k_size
+	L3:
+	cmp Grid[esi],bl
+	je next_letter
+	inc esi
+	loop l3
+	mov [edi],ebx
+	inc edi
+	next_letter:
+	inc bl
+	cmp bl,'J'
+	je next_letter
+	mov ecx,edx
+	loop l2
+	mov ecx,25
+	mov esi,offset Grid
+	print:
+	mov eax,[esi]
+	call writechar
+	inc esi
+	loop print
+	ret
+	GenerateGrid ENDP
+END main

@@ -1,0 +1,127 @@
+INCLUDE Irvine32.inc
+strLen=26
+.data
+
+key BYTE strLen DUP(?),0
+k_size dword ?
+Grid byte 25 DUP(?),0
+pText byte 250 DUP(?),0
+nPText byte 250 DUP(?),0
+nPTextSize byte ?
+prompt0 byte "Enter 1 to Encrypt 2 to Dycrypt:",0
+prompt1 byte "Enter Your String(max 250 characters) :",0
+
+.code
+    main PROC
+        call begins
+        exit
+    main ENDP
+
+	begins proc
+		mov edx,offset prompt0
+		call writestring
+		call readDec
+		cmp eax,1
+		jne nEnc
+		call encrypt
+		jmp rets
+
+		nEnc:
+			cmp eax,2
+			jne nDec
+			;call decrypt
+			jmp rets
+
+		nDec:
+			call begins
+
+		rets:
+			ret
+	begins endp
+
+	encrypt proc
+		call GenerateRandomString
+		call pEntery
+		ret
+	encrypt endp
+
+    GenerateRandomString PROC USES ecx
+        mov ecx, lengthOf key
+        mov esi, offset key
+		mov eax,strlen
+		call randomize
+		call randomrange
+		mov k_size,eax
+		mov ecx,k_size
+        L2:
+            mov eax, strlen-1
+            call RandomRange
+            add eax, 65
+			mov edx,ecx
+			mov ecx,k_size
+			mov edi,offset key
+			repne scasb
+			jz sameChar
+            mov [esi], eax
+			inc esi
+			mov ecx,edx
+			jmp outss
+			sameChar:
+			mov ecx,edx
+			inc ecx
+			outss:
+        loop L2
+		mov edx,offset key
+        ret
+    GenerateRandomString ENDP
+
+
+	pEntery proc
+		mov edx,offset prompt1
+		call writeString
+		mov edx,offset pText
+		mov ecx,lengthof pText
+		call readString
+		
+		mov ecx,lengthof pText
+		mov ebx,0
+		mov esi,offset pText
+		mov edi,offset nPText
+		L1:
+			lodsb
+			cmp al,32
+			je outss
+			cmp al,65
+			jl outss
+			cmp al,'J'
+			jne noJ
+				mov al,'I'
+			noJ:
+				stosb
+			inc ebx
+			outss:
+		loop L1
+
+		mov edx,offset nPText
+		mov nPTextSize,bl
+		mov eax,ebx
+		mov edx,0
+		mov ebx,2
+		div ebx
+		cmp edx,0
+		je nNeed
+			mov al,'Z'
+			inc  nPTextSize
+			mov [edi],al
+			mov eax,[edi]
+		nNeed:
+			ret	
+	pEntery endp
+
+
+
+
+
+
+
+END main
